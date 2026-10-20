@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>E-Presensi</title>
+  <meta name="theme-color" content="#03482d">
+  <meta name="description" content="Aplikasi presensi siswa">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Presensi">
+  <style>
+    html, body { margin:0; height:100%; background:#03482d; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+    #app { position:fixed; inset:0; width:100%; height:100%; border:0; background:#fff; }
+    #splash { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; color:#fff; text-align:center; padding:24px;
+      background:linear-gradient(160deg,#04583a 0%,#02321f 60%,#01160e 100%); transition:opacity .3s; }
+    #splash.selesai { opacity:0; pointer-events:none; }
+    .medali { width:96px; height:96px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 5px rgba(255,255,255,.1),0 0 0 6px rgba(214,181,98,.7); }
+    .medali img { width:70%; height:70%; object-fit:contain; border-radius:50%; }
+    .titik { width:34px; height:34px; border:3px solid rgba(255,255,255,.25); border-top-color:#fff; border-radius:50%; animation:putar .8s linear infinite; }
+    @keyframes putar { to { transform:rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .titik { animation-duration:2.5s; } }
+    #splash a { color:#d6b562; font-size:14px; }
+    #splash p { margin:0; font-size:15px; opacity:.85; max-width:34ch; line-height:1.5; }
+    #pesan code { background:rgba(255,255,255,.12); padding:2px 6px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <div id="splash" role="status">
+    <div class="medali"><img src="icons/icon-192.png" alt=""></div>
+    <div class="titik" id="titik"></div>
+    <p id="pesan">Memuat aplikasi…</p>
+    <a id="tautan" href="#" rel="noopener" hidden>Buka aplikasi di tab baru</a>
+  </div>
+  <noscript><p style="color:#fff;padding:24px">Aktifkan JavaScript untuk membuka aplikasi.</p></noscript>
+  <script src="config.js"></script>
+  <script>
+    (function () {
+      var cfg = window.PRESENSI || {};
+      var url = String(cfg.appUrl || '');
+      var pesan = document.getElementById('pesan'), tautan = document.getElementById('tautan'), titik = document.getElementById('titik');
+
+      if (!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec/.test(url) || url.indexOf('GANTI_DENGAN') >= 0) {
+        titik.hidden = true;
+        pesan.innerHTML = 'Alamat aplikasi belum diisi.<br>Buka <code>config.js</code> lalu isi <code>appUrl</code> dengan alamat Web App Apps Script.';
+        return;
+      }
+      tautan.href = url; tautan.hidden = false;
+
+      if (cfg.mode === 'redirect') { location.replace(url); return; }
+
+      var f = document.createElement('iframe');
+      f.id = 'app'; f.title = 'E-Presensi';
+      f.setAttribute('allow', 'camera; fullscreen; clipboard-write');
+      f.setAttribute('referrerpolicy', 'no-referrer');
+      f.addEventListener('load', function () { document.getElementById('splash').classList.add('selesai'); });
+      f.src = url;
+      document.body.insertBefore(f, document.getElementById('splash'));
+    })();
+  </script>
+</body>
+</html>
